@@ -12,6 +12,7 @@ import { AddLessonForm } from "@/components/courses/AddLessonForm";
 import { LessonPlayer } from "@/components/courses/LessonPlayer";
 import { CourseReviews } from "@/components/reviews/CourseReviews";
 import { GenerateCertificateButton } from "@/components/certificate/CertificateCard";
+import { CourseQuiz } from "@/components/quiz/CourseQuiz";
 
 type Lesson = { title?: string; videoUrl?: string };
 
@@ -195,6 +196,14 @@ export default async function CoursePage({
             ))}
           </ul>
         )}
+
+        {/* Quiz Section */}
+        <div className="mt-12">
+          <h2 className="mb-6 text-xl font-bold text-slate-900 dark:text-white">
+            Course Quiz
+          </h2>
+          <CourseQuiz courseId={id} isEnrolled={!!enrollment} />
+        </div>
 
         {/* Certificate Section */}
         {enrollment && (
