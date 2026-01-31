@@ -10,6 +10,8 @@ import { ProgressBar } from "@/components/ui/ProgressBar";
 import { EnrollButton } from "@/components/courses/EnrollButton";
 import { AddLessonForm } from "@/components/courses/AddLessonForm";
 import { LessonPlayer } from "@/components/courses/LessonPlayer";
+import { CourseReviews } from "@/components/reviews/CourseReviews";
+import { GenerateCertificateButton } from "@/components/certificate/CertificateCard";
 
 type Lesson = { title?: string; videoUrl?: string };
 
@@ -193,6 +195,24 @@ export default async function CoursePage({
             ))}
           </ul>
         )}
+
+        {/* Certificate Section */}
+        {enrollment && (
+          <div className="mt-12">
+            <h2 className="mb-6 text-xl font-bold text-slate-900 dark:text-white">
+              Certificate
+            </h2>
+            <GenerateCertificateButton courseId={id} progress={enrollment.progress} />
+          </div>
+        )}
+
+        {/* Reviews Section */}
+        <div className="mt-12">
+          <h2 className="mb-6 text-xl font-bold text-slate-900 dark:text-white">
+            Reviews
+          </h2>
+          <CourseReviews courseId={id} isEnrolled={!!enrollment} />
+        </div>
       </div>
     </main>
   );
