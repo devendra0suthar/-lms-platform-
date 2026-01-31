@@ -6,14 +6,14 @@ import { DatabaseUnavailable } from "@/components/ui/DatabaseUnavailable";
 import { CourseCard, type CourseCardItem } from "./CourseCard";
 
 type CoursesPageProps =
-  | { courses: CourseCardItem[] }
-  | { dbUnavailable: true; errorMessage?: string };
+  | { courses: CourseCardItem[]; dbUnavailable?: false }
+  | { dbUnavailable: true; errorMessage?: string; courses?: never };
 
 export function CoursesPage(props: CoursesPageProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"default" | "title" | "lessons">("default");
 
-  if ("dbUnavailable" in props && props.dbUnavailable) {
+  if (props.dbUnavailable) {
     return (
       <main className="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
         <div className="mx-auto max-w-6xl px-4 py-10">
@@ -24,7 +24,7 @@ export function CoursesPage(props: CoursesPageProps) {
     );
   }
 
-  const { courses } = props;
+  const courses = props.courses;
 
   // Filter and sort courses
   const filteredCourses = useMemo(() => {
