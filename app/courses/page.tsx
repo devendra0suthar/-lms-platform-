@@ -8,9 +8,26 @@ export const dynamic = "force-dynamic";
 export default async function Page() {
   try {
     await connectDB();
-    const courses = (await Course.find()
+    const rawCourses = await Course.find()
       .populate("instructor", "name email")
-      .lean()) as CourseCardItem[];
+      .lean();
+
+    // Serialize MongoDB documents for Client Component
+    const courses: CourseCardItem[] = JSON.parse(JSON.stringify(rawCourses.map((course) => ({
+      _id: String(course._id),
+      title: course.title,
+      description: course.description,
+      lessons: Array.isArray(course.lessons)
+        ? course.lessons.map((l: { title?: string; videoUrl?: string }) => ({
+            title: l.title,
+            videoUrl: l.videoUrl
+          }))
+        : [],
+      instructor: course.instructor ? {
+        name: (course.instructor as { name?: string }).name,
+      } : undefined,
+    }))));
+
     return <CoursesPage courses={courses} />;
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
