@@ -16,6 +16,8 @@ const UserSchema = new mongoose.Schema({
     enum: ["student", "instructor", "admin"],
     default: "student",
   },
+  resetToken: { type: String },
+  resetTokenExpiry: { type: Date },
 }, { timestamps: true });
 
 export default mongoose.models.User || mongoose.model("User", UserSchema);
