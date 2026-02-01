@@ -1,3 +1,6 @@
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import connectDB, { isConnectionError } from "@/lib/db";
 import Course from "@/models/Course";
 import { CoursesPage } from "@/components/courses/CoursesPage";
@@ -6,6 +9,12 @@ import type { CourseCardItem } from "@/components/courses/CourseCard";
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect("/login");
+  }
+
   try {
     await connectDB();
     const rawCourses = await Course.find()

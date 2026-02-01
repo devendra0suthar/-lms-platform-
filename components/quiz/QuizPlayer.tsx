@@ -48,6 +48,14 @@ export function QuizPlayer({ quiz }: { quiz: Quiz }) {
   const isLastQuestion = currentQuestion === quiz.questions.length - 1;
   const allAnswered = answers.every((a) => a !== null);
 
+  function resetQuiz() {
+    setCurrentQuestion(0);
+    setAnswers(new Array(quiz.questions.length).fill(null));
+    setSubmitted(false);
+    setLoading(false);
+    setResult(null);
+  }
+
   function selectAnswer(optionIndex: number) {
     if (submitted) return;
     const newAnswers = [...answers];
@@ -101,7 +109,7 @@ export function QuizPlayer({ quiz }: { quiz: Quiz }) {
             </div>
           </div>
           <div className="mt-8 flex justify-center gap-4">
-            <Button variant="outline" onClick={() => router.refresh()}>
+            <Button variant="outline" onClick={resetQuiz}>
               Try Again
             </Button>
             <Button onClick={() => router.back()}>

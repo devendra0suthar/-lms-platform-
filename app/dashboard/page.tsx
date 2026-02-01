@@ -8,6 +8,7 @@ import Course from "@/models/Course";
 import { Card, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
+import { CourseRecommendations } from "@/components/courses/CourseRecommendations";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -231,6 +232,11 @@ export default async function DashboardPage() {
             )}
           </ul>
         )}
+
+        {/* AI Recommendations Section */}
+        <div className="mt-12">
+          <CourseRecommendations />
+        </div>
       </div>
     </main>
   );

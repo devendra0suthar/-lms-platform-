@@ -1,4 +1,4 @@
-import cloudinary from "cloudinary";
+import { v2 as cloudinary } from "cloudinary";
 import { Readable } from "stream";
 
 cloudinary.config({
@@ -21,7 +21,7 @@ export async function uploadFile(
 ): Promise<{ url: string; secureUrl: string; publicId: string }> {
   const { resourceType = "video", folder = "lms", publicId } = options;
   return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.v2.uploader.upload_stream(
+    const uploadStream = cloudinary.uploader.upload_stream(
       {
         resource_type: resourceType,
         folder,

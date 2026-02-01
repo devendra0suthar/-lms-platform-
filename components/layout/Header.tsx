@@ -34,9 +34,15 @@ export function Header() {
               >
                 Dashboard
               </Link>
-              <span className="hidden rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-400 sm:inline">
-                {session.user?.email}
-              </span>
+              <Link
+                href="/profile"
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+              >
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-400">
+                  {session.user?.name?.charAt(0).toUpperCase() || session.user?.email?.charAt(0).toUpperCase()}
+                </span>
+                <span className="hidden sm:inline">Profile</span>
+              </Link>
               <Button
                 variant="ghost"
                 size="sm"

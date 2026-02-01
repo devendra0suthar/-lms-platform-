@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import connectDB from "@/lib/db";
@@ -13,6 +13,7 @@ import { LessonPlayer } from "@/components/courses/LessonPlayer";
 import { CourseReviews } from "@/components/reviews/CourseReviews";
 import { GenerateCertificateButton } from "@/components/certificate/CertificateCard";
 import { CourseQuiz } from "@/components/quiz/CourseQuiz";
+import { ChatWidget } from "@/components/chat/ChatWidget";
 
 type Lesson = { title?: string; videoUrl?: string };
 
@@ -23,6 +24,11 @@ export default async function CoursePage({
 }) {
   const { id } = await params;
   const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect("/login");
+  }
+
   await connectDB();
 
   const course = await Course.findById(id)
@@ -223,6 +229,15 @@ export default async function CoursePage({
           <CourseReviews courseId={id} isEnrolled={!!enrollment} />
         </div>
       </div>
+
+      {/* AI Chat Widget */}
+      <ChatWidget
+        courseContext={{
+          title: course.title ?? "Untitled Course",
+          description: course.description ?? "",
+          lessons: lessons.map((l) => ({ title: l.title ?? "Untitled Lesson" })),
+        }}
+      />
     </main>
   );
 }
