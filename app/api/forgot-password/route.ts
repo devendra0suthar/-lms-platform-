@@ -33,7 +33,10 @@ export async function POST(request: Request) {
       { resetToken, resetTokenExpiry }
     );
 
-    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    // Get base URL from request or environment
+    const host = request.headers.get("host") || "";
+    const protocol = host.includes("localhost") ? "http" : "https";
+    const baseUrl = process.env.NEXTAUTH_URL || `${protocol}://${host}`;
     const resetUrl = `${baseUrl}/reset-password?token=${resetToken}`;
 
     // Send email using Resend
