@@ -226,7 +226,7 @@ export default async function CoursePage({
           <h2 className="mb-6 text-xl font-bold text-slate-900 dark:text-white">
             Reviews
           </h2>
-          <CourseReviews courseId={id} isEnrolled={!!enrollment} />
+          <CourseReviews courseId={id} isEnrolled={!!enrollment} isCompleted={enrollment?.progress === 100} />
         </div>
       </div>
 

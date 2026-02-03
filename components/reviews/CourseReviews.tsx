@@ -50,7 +50,7 @@ function StarRating({ rating, onRate, interactive = false }: {
   );
 }
 
-export function CourseReviews({ courseId, isEnrolled }: { courseId: string; isEnrolled: boolean }) {
+export function CourseReviews({ courseId, isEnrolled, isCompleted = false }: { courseId: string; isEnrolled: boolean; isCompleted?: boolean }) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [averageRating, setAverageRating] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
@@ -123,7 +123,7 @@ export function CourseReviews({ courseId, isEnrolled }: { courseId: string; isEn
               <span className="text-slate-500">({totalReviews} reviews)</span>
             </div>
           </div>
-          {isEnrolled && !showForm && (
+          {isEnrolled && isCompleted && !showForm && (
             <Button onClick={() => setShowForm(true)}>
               Write a Review
             </Button>
@@ -200,7 +200,7 @@ export function CourseReviews({ courseId, isEnrolled }: { courseId: string; isEn
       {reviews.length === 0 && !showForm && (
         <Card className="border-dashed">
           <p className="text-center text-slate-500">
-            No reviews yet. {isEnrolled ? "Be the first to review!" : "Enroll to leave a review."}
+            No reviews yet. {isCompleted ? "Be the first to review!" : isEnrolled ? "Complete the course to leave a review." : "Enroll and complete the course to leave a review."}
           </p>
         </Card>
       )}
