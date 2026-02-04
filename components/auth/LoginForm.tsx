@@ -21,6 +21,23 @@ export function LoginForm() {
     e.preventDefault();
     setError("");
     setLoading(true);
+
+    // First verify credentials with our custom API to get specific error messages
+    const verifyRes = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const verifyData = await verifyRes.json().catch(() => ({}));
+
+    if (!verifyRes.ok) {
+      setLoading(false);
+      setError(verifyData.error ?? "Login failed");
+      return;
+    }
+
+    // Credentials are valid, now sign in with NextAuth
     const res = await signIn("credentials", {
       email,
       password,
@@ -28,7 +45,7 @@ export function LoginForm() {
     });
     setLoading(false);
     if (res?.error) {
-      setError("Invalid email or password");
+      setError("Login failed. Please try again.");
       return;
     }
     router.push(callbackUrl);

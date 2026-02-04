@@ -3,6 +3,25 @@ import bcrypt from "bcryptjs";
 import connectDB, { isConnectionError } from "@/lib/db";
 import User from "@/models/User";
 
+function isPasswordStrong(password: string): { valid: boolean; message: string } {
+  if (password.length < 8) {
+    return { valid: false, message: "Password must be at least 8 characters" };
+  }
+  if (!/[A-Z]/.test(password)) {
+    return { valid: false, message: "Password must contain at least one uppercase letter" };
+  }
+  if (!/[a-z]/.test(password)) {
+    return { valid: false, message: "Password must contain at least one lowercase letter" };
+  }
+  if (!/[0-9]/.test(password)) {
+    return { valid: false, message: "Password must contain at least one number" };
+  }
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    return { valid: false, message: "Password must contain at least one special character" };
+  }
+  return { valid: true, message: "" };
+}
+
 export async function POST(request: Request) {
   try {
     const { name, email, password, role } = await request.json();
@@ -12,6 +31,15 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    const passwordCheck = isPasswordStrong(password);
+    if (!passwordCheck.valid) {
+      return NextResponse.json(
+        { error: passwordCheck.message },
+        { status: 400 }
+      );
+    }
+
     await connectDB();
     const existing = await User.findOne({ email: email.trim().toLowerCase() });
     if (existing) {
