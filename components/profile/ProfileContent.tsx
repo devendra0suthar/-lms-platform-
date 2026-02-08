@@ -68,6 +68,9 @@ export function ProfileContent() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"courses" | "certificates" | "created">("courses");
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState("");
+  const [savingName, setSavingName] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -84,6 +87,31 @@ export function ProfileContent() {
       console.error("Failed to fetch profile:", error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  function startEditingName() {
+    setNameInput(profile?.user.name ?? "");
+    setEditingName(true);
+  }
+
+  async function handleNameSave() {
+    if (!nameInput.trim()) return;
+    setSavingName(true);
+    try {
+      const res = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: nameInput.trim() }),
+      });
+      if (res.ok) {
+        setEditingName(false);
+        fetchProfile();
+      }
+    } catch (error) {
+      console.error("Failed to update name:", error);
+    } finally {
+      setSavingName(false);
     }
   }
 
@@ -164,7 +192,61 @@ export function ProfileContent() {
 
             {/* User Info */}
             <div className="text-center sm:text-left">
-              <h1 className="text-3xl font-bold text-white sm:text-4xl">{user.name}</h1>
+              {editingName ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={nameInput}
+                    onChange={(e) => setNameInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleNameSave();
+                      if (e.key === "Escape") setEditingName(false);
+                    }}
+                    autoFocus
+                    className="rounded-xl border-2 border-white/30 bg-white/10 px-4 py-2 text-2xl font-bold text-white placeholder-white/50 backdrop-blur-sm focus:border-white/60 focus:outline-none sm:text-3xl"
+                  />
+                  <button
+                    onClick={handleNameSave}
+                    disabled={savingName || !nameInput.trim()}
+                    className="rounded-xl bg-white/20 p-2.5 text-white backdrop-blur-sm transition-colors hover:bg-white/30 disabled:opacity-50"
+                    title="Save"
+                  >
+                    {savingName ? (
+                      <svg className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                    ) : (
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => setEditingName(false)}
+                    disabled={savingName}
+                    className="rounded-xl bg-white/10 p-2.5 text-white/70 backdrop-blur-sm transition-colors hover:bg-white/20 hover:text-white"
+                    title="Cancel"
+                  >
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                <div className="group flex items-center justify-center gap-3 sm:justify-start">
+                  <h1 className="text-3xl font-bold text-white sm:text-4xl">{user.name}</h1>
+                  <button
+                    onClick={startEditingName}
+                    className="rounded-lg p-1.5 text-white/40 transition-colors hover:bg-white/10 hover:text-white/80 group-hover:text-white/60"
+                    title="Edit name"
+                  >
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                </div>
+              )}
               <p className="mt-2 flex items-center justify-center gap-2 text-white/80 sm:justify-start">
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />

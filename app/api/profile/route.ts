@@ -110,3 +110,47 @@ export async function GET() {
     return NextResponse.json({ error: "Failed to fetch profile" }, { status: 500 });
   }
 }
+
+export async function PUT(req: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const name = typeof body.name === "string" ? body.name.trim() : "";
+
+    if (!name) {
+      return NextResponse.json({ error: "Name is required" }, { status: 400 });
+    }
+
+    await connectDB();
+
+    const user = await User.findByIdAndUpdate(
+      session.user.id,
+      { name },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      user: {
+        _id: String(user._id),
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        createdAt: user.createdAt,
+      },
+    });
+  } catch (e) {
+    if (isConnectionError(e)) {
+      return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
+    }
+    console.error("Profile update error:", e);
+    return NextResponse.json({ error: "Failed to update profile" }, { status: 500 });
+  }
+}
