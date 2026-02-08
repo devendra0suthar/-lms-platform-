@@ -24,6 +24,13 @@ type StudentDashboardProps = {
   inProgressCourses: number;
 };
 
+function getProgressColor(progress: number) {
+  if (progress === 100) return "text-emerald-600 dark:text-emerald-400";
+  if (progress >= 70) return "text-green-600 dark:text-green-400";
+  if (progress >= 30) return "text-amber-600 dark:text-amber-400";
+  return "text-red-500 dark:text-red-400";
+}
+
 export function StudentDashboard({
   session,
   greeting,
@@ -33,6 +40,13 @@ export function StudentDashboard({
   completedCourses,
   inProgressCourses,
 }: StudentDashboardProps) {
+  const overallProgress =
+    enrollments.length > 0
+      ? Math.round(
+          enrollments.reduce((sum, e) => sum + e.progress, 0) / enrollments.length
+        )
+      : 0;
+
   return (
     <main className="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       {/* Hero Header */}
@@ -54,6 +68,18 @@ export function StudentDashboard({
                 </Badge>
                 <span className="text-sm text-white/70">{session.user?.email}</span>
               </div>
+              {/* Overall progress in header */}
+              {enrollments.length > 0 && (
+                <div className="mt-4 max-w-xs">
+                  <div className="flex items-center justify-between text-xs text-white/70">
+                    <span>Overall Progress</span>
+                    <span className="font-semibold text-white">{overallProgress}%</span>
+                  </div>
+                  <div className="mt-1.5">
+                    <ProgressBar value={overallProgress} variant="light" />
+                  </div>
+                </div>
+              )}
             </div>
             <div className="flex flex-wrap gap-3">
               {(role === "instructor" || role === "admin") && (
@@ -130,11 +156,18 @@ export function StudentDashboard({
       {/* Enrollments Section */}
       <div className="mx-auto max-w-6xl px-4 py-10">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-            My Learning
-          </h2>
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/50">
+              <svg className="h-5 w-5 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+              My Learning
+            </h2>
+          </div>
           {enrollments.length > 0 && (
-            <span className="text-sm text-slate-500 dark:text-slate-400">
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">
               {enrollments.length} {enrollments.length === 1 ? "course" : "courses"}
             </span>
           )}
@@ -142,21 +175,21 @@ export function StudentDashboard({
 
         {enrollments.length === 0 ? (
           <Card className="border-dashed border-slate-300 bg-white/50 backdrop-blur dark:border-slate-700 dark:bg-slate-800/50">
-            <div className="flex flex-col items-center py-12">
-              <div className="mb-4 rounded-full bg-indigo-100 p-4 dark:bg-indigo-900/50">
-                <svg className="h-8 w-8 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="flex flex-col items-center py-16">
+              <div className="mb-5 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 p-5 dark:from-indigo-900/50 dark:to-purple-900/50">
+                <svg className="h-10 w-10 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
               </div>
-              <p className="text-lg font-medium text-slate-700 dark:text-slate-300">
+              <p className="text-lg font-semibold text-slate-700 dark:text-slate-300">
                 No courses yet
               </p>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                Start your learning journey today
+              <p className="mt-1 max-w-xs text-center text-sm text-slate-500 dark:text-slate-400">
+                Start your learning journey today by exploring our course catalog
               </p>
               <Link
                 href="/courses"
-                className="mt-6 inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 font-semibold text-white transition-colors hover:bg-indigo-700"
+                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-500/30"
               >
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -176,14 +209,30 @@ export function StudentDashboard({
                 const totalLessons = Array.isArray(course?.lessons) ? course.lessons.length : 0;
                 const completedLessonCount = e.completedLessons?.length ?? 0;
                 const isComplete = e.progress === 100;
+                const notStarted = e.progress === 0;
 
                 return (
                   <li key={String(e._id)} className="animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
                     <Link href={`/courses/${String(courseId)}`} className="group block h-full">
-                      <Card className={`h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${isComplete ? 'border-emerald-200 dark:border-emerald-800' : ''}`}>
+                      <Card className={`relative h-full overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
+                        isComplete ? 'border-emerald-200 dark:border-emerald-800' : ''
+                      }`}>
+                        {/* Top color accent bar */}
+                        <div className={`absolute top-0 left-0 right-0 h-1 ${
+                          isComplete
+                            ? "bg-gradient-to-r from-emerald-400 to-emerald-600"
+                            : notStarted
+                            ? "bg-gradient-to-r from-slate-300 to-slate-400 dark:from-slate-600 dark:to-slate-700"
+                            : "bg-gradient-to-r from-indigo-400 to-purple-500"
+                        }`} />
+
                         {/* Progress indicator */}
-                        <div className="mb-4 flex items-center justify-between">
-                          <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${isComplete ? 'bg-emerald-100 dark:bg-emerald-900/50' : 'bg-indigo-100 dark:bg-indigo-900/50'}`}>
+                        <div className="mb-4 flex items-center justify-between pt-1">
+                          <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${
+                            isComplete
+                              ? 'bg-gradient-to-br from-emerald-100 to-emerald-50 dark:from-emerald-900/50 dark:to-emerald-800/30'
+                              : 'bg-gradient-to-br from-indigo-100 to-purple-50 dark:from-indigo-900/50 dark:to-purple-800/30'
+                          }`}>
                             {isComplete ? (
                               <svg className="h-5 w-5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -197,8 +246,12 @@ export function StudentDashboard({
                           </div>
                           {isComplete ? (
                             <Badge variant="success">Completed</Badge>
+                          ) : notStarted ? (
+                            <Badge variant="muted">Not Started</Badge>
                           ) : (
-                            <Badge variant="primary">{e.progress}%</Badge>
+                            <span className={`text-sm font-bold ${getProgressColor(e.progress)}`}>
+                              {e.progress}%
+                            </span>
                           )}
                         </div>
 
@@ -210,13 +263,18 @@ export function StudentDashboard({
                         </CardDescription>
 
                         {/* Progress bar */}
-                        <div className="mt-4">
+                        <div className="mt-5">
                           <ProgressBar value={e.progress} />
-                          <div className="mt-2 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                            <span>{completedLessonCount} of {totalLessons} lessons</span>
-                            <span className="flex items-center gap-1 text-indigo-600 opacity-0 transition-opacity group-hover:opacity-100 dark:text-indigo-400">
-                              Continue
-                              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <div className="mt-2.5 flex items-center justify-between text-xs">
+                            <span className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                              </svg>
+                              {completedLessonCount} of {totalLessons} lessons
+                            </span>
+                            <span className="flex items-center gap-1 font-medium text-indigo-600 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0 translate-x-[-4px] dark:text-indigo-400">
+                              {isComplete ? "Review" : notStarted ? "Start" : "Continue"}
+                              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                               </svg>
                             </span>
