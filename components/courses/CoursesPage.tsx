@@ -68,15 +68,15 @@ export function CoursesPage(props: CoursesPageProps) {
               </svg>
               <input
                 type="text"
-                placeholder="Search courses..."
+                placeholder="Search by title, description, or instructor..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-12 pr-4 text-slate-900 placeholder-slate-400 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-indigo-400"
+                className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-12 pr-10 text-slate-900 placeholder-slate-400 shadow-sm transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-indigo-400"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -85,63 +85,68 @@ export function CoursesPage(props: CoursesPageProps) {
               )}
             </div>
 
-            {/* Sort Dropdown */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-slate-500 dark:text-slate-400">Sort by:</span>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
-              >
-                <option value="default">Default</option>
-                <option value="title">Title (A-Z)</option>
-                <option value="lessons">Most Lessons</option>
-              </select>
+            {/* Sort & Results */}
+            <div className="flex items-center gap-4">
+              {searchQuery && (
+                <span className="text-sm text-slate-500 dark:text-slate-400">
+                  {filteredCourses.length} {filteredCourses.length === 1 ? "result" : "results"}
+                </span>
+              )}
+              <div className="flex items-center gap-2">
+                <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                </svg>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                >
+                  <option value="default">Default</option>
+                  <option value="title">Title (A-Z)</option>
+                  <option value="lessons">Most Lessons</option>
+                </select>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Results count when searching */}
-        {searchQuery && (
-          <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
-            Found {filteredCourses.length} {filteredCourses.length === 1 ? "course" : "courses"} for "{searchQuery}"
-          </p>
-        )}
-
         {courses.length === 0 ? (
           <Card className="border-dashed border-slate-300 bg-white/50 backdrop-blur dark:border-slate-700 dark:bg-slate-800/50">
-            <div className="flex flex-col items-center py-12">
-              <div className="mb-4 rounded-full bg-slate-100 p-4 dark:bg-slate-800">
-                <svg className="h-8 w-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="flex flex-col items-center py-16">
+              <div className="mb-5 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 p-5 dark:from-indigo-900/50 dark:to-purple-900/50">
+                <svg className="h-10 w-10 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
               </div>
-              <p className="text-lg font-medium text-slate-600 dark:text-slate-400">
+              <p className="text-lg font-semibold text-slate-700 dark:text-slate-300">
                 No courses available yet
               </p>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-500">
+              <p className="mt-1 max-w-xs text-center text-sm text-slate-500 dark:text-slate-400">
                 Check back soon for new learning opportunities
               </p>
             </div>
           </Card>
         ) : filteredCourses.length === 0 ? (
           <Card className="border-dashed border-slate-300 bg-white/50 backdrop-blur dark:border-slate-700 dark:bg-slate-800/50">
-            <div className="flex flex-col items-center py-12">
-              <div className="mb-4 rounded-full bg-slate-100 p-4 dark:bg-slate-800">
-                <svg className="h-8 w-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="flex flex-col items-center py-16">
+              <div className="mb-5 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 p-5 dark:from-slate-800 dark:to-slate-700">
+                <svg className="h-10 w-10 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
-              <p className="text-lg font-medium text-slate-600 dark:text-slate-400">
+              <p className="text-lg font-semibold text-slate-700 dark:text-slate-300">
                 No courses found
               </p>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-500">
-                Try a different search term
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                Try a different search term or clear your filters
               </p>
               <button
                 onClick={() => setSearchQuery("")}
-                className="mt-4 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
+                className="mt-5 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-500/30"
               >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
                 Clear search
               </button>
             </div>
@@ -162,30 +167,33 @@ export function CoursesPage(props: CoursesPageProps) {
 
 function CoursesPageHeader({ coursesCount }: { coursesCount: number }) {
   return (
-    <div className="relative overflow-hidden">
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-indigo-100/50 blur-3xl dark:bg-indigo-900/20" />
-        <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-purple-100/50 blur-3xl dark:bg-purple-900/20" />
+    <div className="relative overflow-hidden border-b border-slate-200 bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-700 dark:border-slate-800">
+      <div className="absolute inset-0">
+        <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
       </div>
-      <div className="mx-auto max-w-6xl px-4 py-12 sm:py-16">
+      <div className="relative mx-auto max-w-6xl px-4 py-12 sm:py-16">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-sm font-medium text-white/90 backdrop-blur-sm">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
               Learn at your own pace
-            </p>
-            <h1 className="mt-2 text-4xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-5xl">
+            </div>
+            <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
               Explore Courses
             </h1>
-            <p className="mt-3 max-w-xl text-lg text-slate-600 dark:text-slate-400">
+            <p className="mt-3 max-w-xl text-lg text-white/70">
               Discover courses taught by expert instructors. Build new skills and advance your career.
             </p>
           </div>
           {coursesCount > 0 && (
-            <div className="flex items-center gap-2 rounded-full bg-white/80 px-4 py-2 shadow-sm backdrop-blur dark:bg-slate-800/80">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-400">
+            <div className="flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 backdrop-blur-sm">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-sm font-bold text-white">
                 {coursesCount}
               </span>
-              <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+              <span className="text-sm font-medium text-white/90">
                 {coursesCount === 1 ? "Course" : "Courses"} available
               </span>
             </div>
