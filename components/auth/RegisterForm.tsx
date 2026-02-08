@@ -48,6 +48,7 @@ export function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState<"student" | "admin">("student");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -73,7 +74,7 @@ export function RegisterForm() {
     const res = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email, password, role }),
     });
     const data = await res.json().catch(() => ({}));
     setLoading(false);
@@ -98,6 +99,35 @@ export function RegisterForm() {
           onChange={(e) => setName(e.target.value)}
           required
         />
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+            I am signing up as
+          </label>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => setRole("student")}
+              className={`flex-1 rounded-lg border-2 px-4 py-2.5 text-sm font-medium transition-all ${
+                role === "student"
+                  ? "border-indigo-600 bg-indigo-50 text-indigo-700 dark:border-indigo-400 dark:bg-indigo-950/50 dark:text-indigo-300"
+                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600"
+              }`}
+            >
+              Student
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole("admin")}
+              className={`flex-1 rounded-lg border-2 px-4 py-2.5 text-sm font-medium transition-all ${
+                role === "admin"
+                  ? "border-indigo-600 bg-indigo-50 text-indigo-700 dark:border-indigo-400 dark:bg-indigo-950/50 dark:text-indigo-300"
+                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600"
+              }`}
+            >
+              Admin
+            </button>
+          </div>
+        </div>
         <Input
           label="Email"
           type="email"
