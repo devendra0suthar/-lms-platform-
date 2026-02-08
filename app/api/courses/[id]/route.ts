@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import connectDB, { isConnectionError } from "@/lib/db";
 import Course from "@/models/Course";
+import Enrollment from "@/models/Enrollment";
 
 export async function GET(
   _request: Request,
@@ -86,6 +87,51 @@ export async function PATCH(
     }
     return NextResponse.json(
       { error: e instanceof Error ? e.message : "Failed to update course" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const role = (session.user as { role?: string }).role;
+    if (role !== "admin") {
+      return NextResponse.json(
+        { error: "Admin only" },
+        { status: 403 }
+      );
+    }
+
+    const { id } = await params;
+    await connectDB();
+
+    const course = await Course.findByIdAndDelete(id);
+    if (!course) {
+      return NextResponse.json({ error: "Course not found" }, { status: 404 });
+    }
+
+    await Enrollment.deleteMany({ courseId: id });
+
+    return NextResponse.json({ message: "Course deleted" });
+  } catch (e) {
+    if (isConnectionError(e)) {
+      return NextResponse.json(
+        {
+          error:
+            "Database unavailable. Add your IP to MongoDB Atlas → Network Access.",
+        },
+        { status: 503 }
+      );
+    }
+    return NextResponse.json(
+      { error: e instanceof Error ? e.message : "Failed to delete course" },
       { status: 500 }
     );
   }
