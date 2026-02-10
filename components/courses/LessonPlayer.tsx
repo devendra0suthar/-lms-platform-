@@ -6,6 +6,22 @@ import { Card, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 
+function toEmbedUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname === "www.youtube.com" || parsed.hostname === "youtube.com") {
+      const videoId = parsed.searchParams.get("v");
+      if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+    }
+    if (parsed.hostname === "youtu.be") {
+      return `https://www.youtube.com/embed${parsed.pathname}`;
+    }
+  } catch {
+    // not a valid URL, return as-is
+  }
+  return url;
+}
+
 type LessonPlayerProps = {
   courseId: string;
   lessonIndex: number;
@@ -128,9 +144,10 @@ export function LessonPlayer({
                 />
               ) : (
                 <iframe
-                  src={videoUrl}
+                  src={toEmbedUrl(videoUrl)}
                   title={title}
                   className="h-full w-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 />
               )}
